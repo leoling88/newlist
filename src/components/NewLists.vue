@@ -2,10 +2,10 @@
   <div class="news-wrap">
     <div class="news-list-hot">
       <ul>
-        <li>
-          <span class="img"><img src="https://www.baidu.com/s?rsv_idx=1&wd=yui&ie=utf-8&rsv_cq=element+ui+%E5%AE%98%E7%BD%91&rsv_dl=0_right_recommends_merge_28335&euri=14262110" alt=""></span>
-          <h2 class="title">dd</h2>
-          <span class="about">dddd</span>
+        <li v-for="item in newsHot">
+          <span class="img"><img src="item.img" alt=""></span>
+          <h2 class="title" v-text="itme.titel"></h2>
+          <span class="about" v-text="item.text"></span>
         </li>
       </ul>
     </div>
@@ -18,7 +18,13 @@ export default {
   name: 'NewLists',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      newsHot:[
+        {
+          img:'',
+          title:'头条新闻',
+          text:'中国新闻网第一时间'
+        }
+      ]
     }
   }
 }
