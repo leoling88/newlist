@@ -99,7 +99,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.news-wrap{width:25rem;margin:1rem auto;}
+.news-wrap{max-width:40rem;margin:1rem auto;}
 .news-list-hot .type-1{position: relative;height:3rem;border-bottom:1px solid #ccc;padding:.5rem;}
 .news-list-hot .type-1 .img{display:block;width:5rem;height:3rem;position: absolute;top:.5rem;left:.5rem;}
 .news-list-hot .type-1 .img img{width:100%;height:100%;}
