@@ -95,8 +95,13 @@ export default {
   },
   methods: {
    HelloAxios(){
-    this.$http.get('http://14.29.2.89:8090/tv/index.php?m=Home&c=Api&a=RankList&packageId=1505902736&styleId=-1').then(m=>console.log(m.data));
-   },
+
+
+ axios.get('/api/tv/index.php?m=Home&c=Api&a=RankList&packageId=1505902736&styleId=-1', function (res) { 
+   console.log(res) 
+ })
+
+   }
   }
 }
 </script>
