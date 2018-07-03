@@ -95,11 +95,16 @@ export default {
   },
   methods: {
    HelloAxios(){
+        this.$http({
+          method:'get',
+          baseURL: '/api',
+          url:'product/list.do?keyword=手机',
+        }).then(function(res){
+          console.log(res)
+        }).catch(function(err){
+          console.log(err)
+        })
 
-
- axios.get('/api/tv/index.php?m=Home&c=Api&a=RankList&packageId=1505902736&styleId=-1', function (res) { 
-   console.log(res) 
- })
 
    }
   }
