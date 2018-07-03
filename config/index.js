@@ -11,6 +11,7 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
+      /*--跨域
       '/api': {  //使用"/api"来代替"http://f.apiplus.c" 
         target: 'http://happymmall.com', //源地址 
         changeOrigin: true, //改变源 
@@ -18,6 +19,7 @@ module.exports = {
           '^/api': '' //路径重写 
           } 
       } 
+      */
 
     },
 

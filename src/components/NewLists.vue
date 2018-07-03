@@ -94,6 +94,7 @@ export default {
      this.HelloAxios();
   },
   methods: {
+   /*=====跨域 
    HelloAxios(){
         this.$http({
           method:'get',
@@ -106,7 +107,15 @@ export default {
         })
 
 
+   }*/
+   /*=====本地 */
+   HelloAxios(){
+    this.$http.get('goodsdata.json').then((res) => {
+      console.log(res)
+    })
+
    }
+
   }
 }
 </script>
