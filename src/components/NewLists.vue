@@ -50,11 +50,11 @@ export default {
       //var _this = this;
       this.$http({
         method:'get',
-        baseURL: '/api',        //baseURL: '/api'
-        url:'static/goodsdata.json',     //'static/goodsdata.json'
+        baseURL: '',        //baseURL: '/api'
+        url:'test/static/goodsdata.json',     //'static/goodsdata.json'
       }).then((res) => {
         this.newsHot = res.data.listshot;
-        //console.log(res.data.listshot)
+        console.log(res.data.listshot)
       }).catch(function(err){
         console.log(err)
       })
@@ -83,21 +83,21 @@ export default {
               baseURL: '/api',        //baseURL: '/api'
               url:'static/goodsdata.json',     //'static/goodsdata.json'
             }).then((res) => {
-             
-              console.log(res.data.listshot2)
-              this.newsHot=res.data.listshot2
-              this.rolling = true
+              console.log(res.data.listshot)
+              for(var i=0; i < res.data.listshot.length; i ++){
+                this.newsHot.push(res.data.listshot[i])
 
+              }
             }).catch(function(err){
               console.log(err)
             })
             
           }
-
-
-
-console.log("向上滑动")
+          console.log("向上滑动")
         }
+    },
+    touchEnd(e){
+      alert()
 
     }
 
