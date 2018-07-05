@@ -1,6 +1,7 @@
 <template>
-  <div class="news-wrap">
-    <div class="news-list-hot">
+  <div class="news-wrap"  @touchstart="touchStart($event)" res="myScroll"  @touchmove="touchMove($event)">
+
+    <div class="news-list-hot"  >
       <ul>
         <li v-for="item in newsHot" :class="{'type-2': item.otype === '3' , 'type-1': item.otype === '1'}">
             <h2 v-text="item.name"></h2>
@@ -19,46 +20,86 @@
 </template>
 
 <script>
+
+//var w = document.documentElement.clientWidth || document.body.clientWidth;
+var v_h = document.documentElement.clientHeight || document.body.clientHeight;
+//var w = document.documentElement.scrollWidth || document.body.scrollWidth;
+var b_h = document.documentElement.scrollHeight || document.body.scrollHeight;
 export default {
-  name: 'NewLists',
+  name: 'myScroll',
   data () {
     return {
-      newsHot:[]
+      newsHot:[],
+        pageX:0,
+        pageY:0,
+        myScroll:null,
+        scrollTop:0,
+        rolling: true
     }
   },
   created:function(){
      this.HelloAxios();
+
+
+
   },
   methods: {
-   /*=====跨域 */
+   /*=====跨域======= */
 
-  HelloAxios(){
-    //var _this = this;
-    this.$http({
-      method:'get',
-      baseURL: '/api',
-      url:'/static/goodsdata.json',
-    }).then((res) => {
-      this.newsHot = res.data.listshot;
-      console.log(res.data.listshot)
-    }).catch(function(err){
-      console.log(err)
-    })
-  }
+    HelloAxios(){
+      //var _this = this;
+      this.$http({
+        method:'get',
+        baseURL: '/api',        //baseURL: '/api'
+        url:'static/goodsdata.json',     //'static/goodsdata.json'
+      }).then((res) => {
+        this.newsHot = res.data.listshot;
+        //console.log(res.data.listshot)
+      }).catch(function(err){
+        console.log(err)
+      })
+    },
+    touchStart(e){ //触摸事件
+        this.pageX = e.targetTouches[0].pageX
+        this.pageY = e.targetTouches[0].pageY
+        this.scrollTop = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset
+        console.log("X:" + this.pageX +"||" +"Y:" + this.pageY)
+    },
+    touchMove(e){ //触摸滑动事件
+       this.scrollPosition = this.scrollTop      //获取滚动条位置
+        console.log("滚动条位置:" + this.scrollPosition)
+        console.log(e.targetTouches[0].pageY+"<=======>"+this.pageY)
+        if(e.targetTouches[0].pageY>this.pageY){ //向下滑动
+                    console.log("向下滑动")            
 
-  // HelloAxios(){
-  //   this.$http.get('http://localhost:8080/static/goodsdata.json').then(res => {
-  //     this.newsHot = res.data.listshot;
-  //       console.log(res.data.listshot)
-  //   }, response => {
+        }else{ //向上滑动
 
 
-  //   })
+          if(this.rolling == true){
+            this.rolling = false
 
-  // }
+            this.$http({
+              method:'get',
+              baseURL: '/api',        //baseURL: '/api'
+              url:'static/goodsdata.json',     //'static/goodsdata.json'
+            }).then((res) => {
+             
+              console.log(res.data.listshot2)
+              this.newsHot=res.data.listshot2
+              this.rolling = true
 
-   
+            }).catch(function(err){
+              console.log(err)
+            })
+            
+          }
 
+
+
+console.log("向上滑动")
+        }
+
+    }
 
 
   }
