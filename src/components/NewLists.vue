@@ -1,7 +1,6 @@
 <template>
-  <div class="news-wrap" res="myScroll"  @touchstart="touchStart($event)"  @touchmove="touchMove($event)"   @touchend="touchEnd($event)">
-
-    <div class="news-list-hot"  >
+  <div class="sroll-wrap news-wrap" id="ddd" res="myScroll"  :style="{height: myScrollH + 'px'}" @touchstart="touchStart($event)"  @touchmove="touchMove($event)"   @touchend="touchEnd($event)" >
+    <div class="sroll-wrap-box news-list-hot"  >
       <ul>
         <li v-for="item in newsHot" :class="{'type-2': item.otype === '3' , 'type-1': item.otype === '1'}">
             <h2 v-text="item.name"></h2>
@@ -10,11 +9,9 @@
         </li>
       </ul>
     </div>
-<!--     <div class="news-list">
-      <ul>
-        <li v-for="item in newslists"></li>
-      </ul>
-    </div> -->
+    <div v-if="loadMore">上拉加载更多数据</div>
+    <div v-if="loadIn">努力加载中...</div>
+
     
   </div>
 </template>
@@ -30,15 +27,19 @@ export default {
   data () {
     return {
       newsHot:[],
-        pageX:0,
-        pageY:0,
-        myScroll:null,
-        scrollTop:0,
-        aspect: 0   //1向上，2向下
+      pageX:0,
+      pageY:0,
+      myScroll:null,
+      scrollTop:0,
+      aspect: 0,  //1向上，2向下
+      myScrollH:0,
+      loadMore: true,
+      loadIn:false
     }
   },
   created:function(){
-     this.HelloAxios();
+     this.HelloAxios()
+
 
 
 
@@ -50,7 +51,7 @@ export default {
       //var _this = this;
       this.$http({
         method:'get',
-        baseURL: '/api',        //baseURL: '/api'
+        baseURL: '',        //baseURL: '/api'
         url:'static/goodsdata.json',     //'static/goodsdata.json'
       }).then((res) => {
         this.newsHot = res.data.listshot;
@@ -62,46 +63,59 @@ export default {
     touchStart(e){ //触摸事件
         this.pageX = e.targetTouches[0].pageX
         this.pageY = e.targetTouches[0].pageY
-        this.scrollTop = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset
         // console.log("X:" + this.pageX +"||" +"Y:" + this.pageY)
+         
     },
     touchMove(e){ //触摸滑动事件
-       this.scrollPosition = this.scrollTop      //获取滚动条位置
-        console.log("滚动条位置:" + this.scrollPosition)
+        //console.log("滚动条位置:" + this.scrollPosition)
         if(e.targetTouches[0].pageY > this.pageY){ //向下滑动
           console.log("向下滑动")            
 
-        }else{ //向上滑动
+        }else if( this.pageY - e.targetTouches[0].pageY > 200){ //向上滑动
           this.aspect = 1
-
-
-          console.log("向上滑动")
+          console.log("向上滑动" + (this.pageY - e.targetTouches[0].pageY) )
         }
     },
     touchEnd(e){
-      if(this.aspect == 1){  //追加数据
+      if(this.aspect == 1 ){  //追加数据
+          this.loadMore = false
+          this.loadIn = true
+          this.aspect = 0
+
           this.$http({
             method:'get',
             baseURL: '',        //baseURL: '/api'
             url:'static/goodsdata.json'     //'static/goodsdata.json'
           }).then((res) => {
-            for(var i = 0; i < res.data.listshot.length; i ++){
-              this.newsHot.push(res.data.listshot[i])
-
+            for(var i = 0; i < res.data.listshot2.length; i ++){
+              this.newsHot.push(res.data.listshot2[i])
+              this.loadIn = false
+              this.loadMore = true
             }
           }).catch(function(err){
             console.log(err)
-          })      
+          })
+
       }
+    },
+    handleScroll () {
+      ///let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+      let offsetTopc = document.querySelector('.sroll-wrap').scrollTop
+      let scrollHeight = document.querySelector('.sroll-wrap').scrollHeight
+      this.scrollTop = offsetTopc
 
     },
-    mounted(){
-
-
+    destroyed () {
+      window.removeEventListener('scroll', this.handleScroll)
     }
+  },
+    mounted: function (){
+      this.myScrollH = window.screen.availHeight
+      //window.addEventListener('scroll', this.handleScroll)
 
 
   }
+
 
 
 
@@ -112,7 +126,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-.news-wrap{width:100%;max-width:20rem;margin:1rem auto;overflow:hidden;}
+.news-wrap{width:100%;max-width:20rem;margin:1rem auto;}
 .news-list-hot .type-1{position: relative;height:3rem;border-bottom:1px solid #ccc;padding:.5rem;}
 .news-list-hot .type-1 .img{display:block;width:5rem;height:3rem;position: absolute;top:.5rem;left:.5rem;}
 .news-list-hot .type-1 .img img{width:100%;height:100%;}
@@ -134,4 +148,6 @@ text-overflow:ellipsis;
 display:-webkit-box; 
 -webkit-box-orient:vertical;
 -webkit-line-clamp:1; }
+
+.sroll-wrap{width:100%;border:1px solid #000;overflow-y:auto;position: relative;}
 </style>
