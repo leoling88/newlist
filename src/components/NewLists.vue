@@ -1,5 +1,5 @@
 <template>
-  <div class="news-wrap"  @touchstart="touchStart($event)" res="myScroll"  @touchmove="touchMove($event)">
+  <div class="news-wrap" res="myScroll"  @touchstart="touchStart($event)"  @touchmove="touchMove($event)"   @touchend="touchEnd($event)">
 
     <div class="news-list-hot"  >
       <ul>
@@ -34,7 +34,7 @@ export default {
         pageY:0,
         myScroll:null,
         scrollTop:0,
-        rolling: true
+        aspect: 0   //1向上，2向下
     }
   },
   created:function(){
@@ -50,11 +50,11 @@ export default {
       //var _this = this;
       this.$http({
         method:'get',
-        baseURL: '',        //baseURL: '/api'
-        url:'test/static/goodsdata.json',     //'static/goodsdata.json'
+        baseURL: '/api',        //baseURL: '/api'
+        url:'static/goodsdata.json',     //'static/goodsdata.json'
       }).then((res) => {
         this.newsHot = res.data.listshot;
-        console.log(res.data.listshot)
+        // console.log(res.data.listshot)
       }).catch(function(err){
         console.log(err)
       })
@@ -63,41 +63,40 @@ export default {
         this.pageX = e.targetTouches[0].pageX
         this.pageY = e.targetTouches[0].pageY
         this.scrollTop = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset
-        console.log("X:" + this.pageX +"||" +"Y:" + this.pageY)
+        // console.log("X:" + this.pageX +"||" +"Y:" + this.pageY)
     },
     touchMove(e){ //触摸滑动事件
        this.scrollPosition = this.scrollTop      //获取滚动条位置
         console.log("滚动条位置:" + this.scrollPosition)
-        console.log(e.targetTouches[0].pageY+"<=======>"+this.pageY)
-        if(e.targetTouches[0].pageY>this.pageY){ //向下滑动
-                    console.log("向下滑动")            
+        if(e.targetTouches[0].pageY > this.pageY){ //向下滑动
+          console.log("向下滑动")            
 
         }else{ //向上滑动
+          this.aspect = 1
 
 
-          if(this.rolling == true){
-            this.rolling = false
-
-            this.$http({
-              method:'get',
-              baseURL: '/api',        //baseURL: '/api'
-              url:'static/goodsdata.json',     //'static/goodsdata.json'
-            }).then((res) => {
-              console.log(res.data.listshot)
-              for(var i=0; i < res.data.listshot.length; i ++){
-                this.newsHot.push(res.data.listshot[i])
-
-              }
-            }).catch(function(err){
-              console.log(err)
-            })
-            
-          }
           console.log("向上滑动")
         }
     },
     touchEnd(e){
-      alert()
+      if(this.aspect == 1){  //追加数据
+          this.$http({
+            method:'get',
+            baseURL: '',        //baseURL: '/api'
+            url:'static/goodsdata.json'     //'static/goodsdata.json'
+          }).then((res) => {
+            for(var i = 0; i < res.data.listshot.length; i ++){
+              this.newsHot.push(res.data.listshot[i])
+
+            }
+          }).catch(function(err){
+            console.log(err)
+          })      
+      }
+
+    },
+    mounted(){
+
 
     }
 
