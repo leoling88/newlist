@@ -9,8 +9,9 @@
         </li>
       </ul>
     </div>
-    <div v-if="loadMore">上拉加载更多数据</div>
-    <div v-if="loadIn">努力加载中...</div>
+    <div v-if="loadMore" class="sroll-more">上拉加载更多数据</div>
+    <div v-if="loadIn" class="sroll-load-style" ><img :src="LoadIcon" alt=""> 努力加载中...</div>
+    <div v-if="loadOff" class="sroll-more">没有更多数据</div>
 
     
   </div>
@@ -22,6 +23,7 @@
 var v_h = document.documentElement.clientHeight || document.body.clientHeight;
 //var w = document.documentElement.scrollWidth || document.body.scrollWidth;
 var b_h = document.documentElement.scrollHeight || document.body.scrollHeight;
+import loadIcon from '@/assets/load.gif'
 export default {
   name: 'myScroll',
   data () {
@@ -32,9 +34,13 @@ export default {
       myScroll:null,
       scrollTop:0,
       aspect: 0,  //1向上，2向下
-      myScrollH:0,
+      myScrollH:0,     //可视框高度
+      myViewH:0,
       loadMore: true,
-      loadIn:false
+      loadIn:false,
+      pageNum:false,
+      loadOff:false,
+      LoadIcon:loadIcon
     }
   },
   created:function(){
@@ -55,6 +61,8 @@ export default {
         url:'static/goodsdata.json',     //'static/goodsdata.json'
       }).then((res) => {
         this.newsHot = res.data.listshot;
+        this.pageNum = true   //是否有更多数据加载
+
         // console.log(res.data.listshot)
       }).catch(function(err){
         console.log(err)
@@ -64,6 +72,7 @@ export default {
         this.pageX = e.targetTouches[0].pageX
         this.pageY = e.targetTouches[0].pageY
         // console.log("X:" + this.pageX +"||" +"Y:" + this.pageY)
+        this.handleScroll()
          
     },
     touchMove(e){ //触摸滑动事件
@@ -72,37 +81,50 @@ export default {
           console.log("向下滑动")            
 
         }else if( this.pageY - e.targetTouches[0].pageY > 200){ //向上滑动
-          this.aspect = 1
-          console.log("向上滑动" + (this.pageY - e.targetTouches[0].pageY) )
+          if((this.myScrollH + this.scrollTop + 50) > this.myViewH){   
+            this.aspect = 1
+          }
+          //console.log("向上滑动" + (this.pageY - e.targetTouches[0].pageY) )
         }
     },
     touchEnd(e){
-      if(this.aspect == 1 ){  //追加数据
+      if(this.aspect == 1){
+        if(this.pageNum == true){  //追加数据
+            this.loadMore = false    //隐藏"加载更多"提示
+            this.loadIn = true    //显示"加载中..."提示
+            this.aspect = 0
+
+            this.$http({
+              method:'get',
+              baseURL: '',        //baseURL: '/api'
+              url:'static/goodsdata.json'     //'static/goodsdata.json'
+            }).then((res) => {
+              for(var i = 0; i < res.data.listshot2.length; i ++){
+                this.newsHot.push(res.data.listshot2[i])
+                this.loadIn = false      //隐藏"加载中..."提示
+                this.loadMore = true     //显示"加载更多"提示
+                this.pageNum = false     //是否有更多数据加载
+              }
+            }).catch(function(err){
+              console.log(err)
+            })
+
+        }else{
+          this.pageNum = false
           this.loadMore = false
-          this.loadIn = true
+          this.loadOff = true
           this.aspect = 0
 
-          this.$http({
-            method:'get',
-            baseURL: '',        //baseURL: '/api'
-            url:'static/goodsdata.json'     //'static/goodsdata.json'
-          }).then((res) => {
-            for(var i = 0; i < res.data.listshot2.length; i ++){
-              this.newsHot.push(res.data.listshot2[i])
-              this.loadIn = false
-              this.loadMore = true
-            }
-          }).catch(function(err){
-            console.log(err)
-          })
-
+        }        
       }
+
     },
     handleScroll () {
-      ///let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
       let offsetTopc = document.querySelector('.sroll-wrap').scrollTop
       let scrollHeight = document.querySelector('.sroll-wrap').scrollHeight
+      this.myViewH = scrollHeight
       this.scrollTop = offsetTopc
+      console.log(this.myScrollH + "==" + this.scrollTop + "==" + this.myViewH)
 
     },
     destroyed () {
@@ -111,6 +133,7 @@ export default {
   },
     mounted: function (){
       this.myScrollH = window.screen.availHeight
+
       //window.addEventListener('scroll', this.handleScroll)
 
 
@@ -149,5 +172,7 @@ display:-webkit-box;
 -webkit-box-orient:vertical;
 -webkit-line-clamp:1; }
 
-.sroll-wrap{width:100%;border:1px solid #000;overflow-y:auto;position: relative;}
+.sroll-wrap{width:100%;overflow-y:auto;-webkit-overflow-scrolling: touch;position: relative;}
+.sroll-more{padding:.5rem;font-size:.7rem;color:#666; text-align:center;background:#eee;}
+.sroll-load-style{width:8rem;position:fixed;left:50%;bottom:0;border-radius:.25rem;margin-left:-4rem;padding:.5rem;font-size:.7rem;color:#666; text-align:center;vertical-align: middle; background:#eee;}
 </style>

@@ -5,7 +5,6 @@ import App from './App'
 import router from './router'
 import axios from 'axios'
 import "babel-polyfill"
-import BScroll from 'better-scroll'
 Vue.prototype.$http = axios;
 
 Vue.config.productionTip = false
