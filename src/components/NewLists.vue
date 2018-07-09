@@ -80,7 +80,7 @@ export default {
         if(e.targetTouches[0].pageY > this.pageY){ //向下滑动
           console.log("向下滑动")            
 
-        }else if( this.pageY - e.targetTouches[0].pageY > 200){ //向上滑动
+        }else if( this.pageY - e.targetTouches[0].pageY > 80){ //向上滑动
           if((this.myScrollH + this.scrollTop + 50) > this.myViewH){   
             this.aspect = 1
           }
