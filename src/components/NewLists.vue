@@ -1,6 +1,8 @@
 <template>
+
   <div class="sroll-wrap news-wrap" id="ddd" res="myScroll"  :style="{height: myScrollH + 'px'}" @touchstart="touchStart($event)"  @touchmove="touchMove($event)"   @touchend="touchEnd($event)" >
-    <div class="sroll-wrap-box news-list-hot"  >
+    <div class="sroll-more" v-if="loadreFresh">下拉刷新数据</div>
+    <div class="sroll-wrap-box news-list-hot srcoll-show" >
       <ul>
         <li v-for="item in newsHot" :class="{'type-2': item.otype === '3' , 'type-1': item.otype === '1'}">
             <h2 v-text="item.name"></h2>
@@ -9,6 +11,7 @@
         </li>
       </ul>
     </div>
+
     <div v-if="loadMore" class="sroll-more">上拉加载更多数据</div>
     <div v-if="loadIn" class="sroll-load-style" ><img :src="LoadIcon" alt=""> 努力加载中...</div>
     <div v-if="loadOff" class="sroll-more">没有更多数据</div>
@@ -40,15 +43,12 @@ export default {
       loadIn:false,
       pageNum:false,
       loadOff:false,
+      loadreFresh:false,
       LoadIcon:loadIcon
     }
   },
   created:function(){
-     this.HelloAxios()
-
-
-
-
+     this.HelloAxios()   //加载数据
   },
   methods: {
    /*=====跨域======= */
@@ -62,6 +62,7 @@ export default {
       }).then((res) => {
         this.newsHot = res.data.listshot;
         this.pageNum = true   //是否有更多数据加载
+        this.viewShow = true
 
         // console.log(res.data.listshot)
       }).catch(function(err){
@@ -78,8 +79,16 @@ export default {
     touchMove(e){ //触摸滑动事件
         //console.log("滚动条位置:" + this.scrollPosition)
         if(e.targetTouches[0].pageY > this.pageY){ //向下滑动
-          console.log("向下滑动")            
+          this.loadreFresh = true
+          if(this.scrollTop == 0 && e.targetTouches[0].pageY - this.pageY > 80){
+            this.aspect = 2
+            this.viewShow = false
 
+
+            // console.log("下拉刷新")            
+          }
+          // console.log("向下滑动")   
+         
         }else if( this.pageY - e.targetTouches[0].pageY > 80){ //向上滑动
           if((this.myScrollH + this.scrollTop + 50) > this.myViewH){   
             this.aspect = 1
@@ -116,14 +125,20 @@ export default {
           this.aspect = 0
 
         }        
+      }else if(this.aspect == 2){
+        this.HelloAxios()
+        this.pageNum = false
+        this.loadMore = false
+        this.loadOff = false
+        this.aspect = 0        
       }
-
+      this.loadreFresh = false
     },
     handleScroll () {
-      let offsetTopc = document.querySelector('.sroll-wrap').scrollTop
+      let offsetTop = document.querySelector('.sroll-wrap').scrollTop
       let scrollHeight = document.querySelector('.sroll-wrap').scrollHeight
       this.myViewH = scrollHeight
-      this.scrollTop = offsetTopc
+      this.scrollTop = offsetTop
       console.log(this.myScrollH + "==" + this.scrollTop + "==" + this.myViewH)
 
     },
@@ -173,6 +188,9 @@ display:-webkit-box;
 -webkit-line-clamp:1; }
 
 .sroll-wrap{width:100%;overflow-y:auto;-webkit-overflow-scrolling: touch;position: relative;}
+
 .sroll-more{padding:.5rem;font-size:.7rem;color:#666; text-align:center;background:#eee;}
 .sroll-load-style{width:8rem;position:fixed;left:50%;bottom:0;border-radius:.25rem;margin-left:-4rem;padding:.5rem;font-size:.7rem;color:#666; text-align:center;vertical-align: middle; background:#eee;}
+
+
 </style>
